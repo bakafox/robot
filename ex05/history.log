@@ -1,0 +1,6 @@
+ros2 run turtlesim turtlesim_node
+ros2 run turtlesim turtle_teleop_key
+ros2 run turtlesim turtlesim_node --ros-args --remap __node:=bakafox_turtle
+ros2 node list > rosnode_list.txt
+ros2 node info $(ros2 node list | grep baka) > rosnode_info.txt
+
