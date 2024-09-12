@@ -1,0 +1,9 @@
+bakafox@laptop:/$ ros2 pkg list | grep ros2topic
+ros2topic
+
+bakafox@laptop:/$ ros2 pkg prefix ros2topic
+/opt/ros/humble
+
+bakafox@laptop:/$ ros2 pkg prefix ros2topic --share
+/opt/ros/humble/share/ros2topic
+
