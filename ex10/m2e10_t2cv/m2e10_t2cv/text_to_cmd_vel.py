@@ -1,8 +1,8 @@
 import rclpy
 from rclpy.node import Node
 
-from std_msgs.msg import String     # Импорт типа СООБЩЕНИЙ (не использ.)
-from geometry_msgs.msg import Twist     # Импорт типа СООБЩЕНИЙ (по усл.)
+from std_msgs.msg import String     # Импорт типа СООБЩЕНИЙ типа String (для приёма из cmd_text)
+from geometry_msgs.msg import Twist     # Импорт типа СООБЩЕНИЙ типа Twist (для отправки в cmd_vel)
 
 
 class Text2Cmd_Retranslator(Node):
@@ -13,13 +13,13 @@ class Text2Cmd_Retranslator(Node):
             String,     # Тип принимаемых СООБЩЕНИЙ
             'cmd_text', # Название ТОПИКА, который слушаем
             self.retranslate,   # Колбэк по получении СООБЩЕНИЯ
-            10          # Хз что это (глубина истории?)
+            10  # Глубина истории принятых сообщений (не исп.)
         )
 
         self.publisher_ = self.create_publisher(
             Twist,      # Тип публикуемых СООБЩЕНИЙ
             '/turtle1/cmd_vel',  # Название ТОПИКА, в который публикуем
-            10          # Хз что это (глубина истории?)
+            10  # Глубина истории отправленных сообщений (не исп.)
         )
 
     def retranslate(self, req):
@@ -44,11 +44,13 @@ class Text2Cmd_Retranslator(Node):
             data.append(False)
 
         res = Twist() # Ответное СООБЩЕНИЕ типа Twist
+        deg2rad_coef = 0.01745329251994329576923690768489
+
         match data[0]:
             case 'turn_right':
-                    res.angular.z = (data[1] or 85.9437) * 0.01745329251994329576923690768489
+                    res.angular.z = (data[1] or 85.9437) * deg2rad_coef
             case 'turn_left':
-                    res.angular.z = (data[1] or 85.9437) * -0.01745329251994329576923690768489
+                    res.angular.z = -(data[1] or 85.9437) * deg2rad_coef
             case 'move_forward':
                     res.linear.x = data[1] or 1.0
             case 'move_backward':
@@ -68,9 +70,7 @@ def main(args=None):
 
     rclpy.spin(t2c_retranslator)  # Крутите барабан!
 
-    rclpy.shutdown()
-    # На самом деле, ни одна строк строка ниже spin() никогда не выполнится,
-    # потому что оный выполняется как бесконечный цикл. Но пусть будет...
+    rclpy.shutdown()    # Безопасное завершение инициализированной среды
 
 
 if __name__ == '__main__':
