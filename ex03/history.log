@@ -1,0 +1,10 @@
+ros2 bag record -o ex03_1 /turtle1/cmd_vel
+sudo apt install ros-$ROS_DISTRO-rosbag2-storage-mcap
+ros2 bag record -s mcap -o ex03_2 ros2 bag record /turtle1/cmd_vels
+ros2 topic list
+ros2 topic echo /turtle1/pose > pose_speed_x1.yaml
+ros2 bag play ex03_2 -r 1.0
+ros2 topic list
+ros2 topic echo /turtle1/pose > pose_speed_x2.yaml
+ros2 bag play ex03_2 -r 2.0
+ls
