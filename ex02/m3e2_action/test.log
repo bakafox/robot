@@ -1,0 +1,5 @@
+cd ~/ros2_ws
+colcon build --packages-select "m3e2_action" "m3e2_action_tc"
+source install/setup.bash
+ros2 pkg list | grep m3e2
+ros2 interface show m3e2_action/action/MessageTurtleCommands
