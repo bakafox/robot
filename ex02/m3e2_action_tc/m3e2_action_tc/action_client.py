@@ -8,7 +8,7 @@ from turtlesim.msg import Pose
 
 
 class TurtleActionClient(Node):
-    def __init__(self):
+    def __init__(self, cmd_array):
         super().__init__('turtle_action_client')
 
         self._action_client = ActionClient(
@@ -19,13 +19,10 @@ class TurtleActionClient(Node):
 
         self.odom = 0 # Одометрия
 
-        self.cmds=[
-            ['sdgsdfgfhkj', 123, 321],
-            ['forward', 2, 0],
-            ['turn_left', 0, 90],
-            ['forward', 1, 0],
-        ]
+        self.cmds = cmd_array
         self.curr_cmd = 0
+
+        self.get_logger().info('Начинаю исполнение %d команд!\n' % len(self.cmds))
         self.sdelat_goal(self.cmds[self.curr_cmd]) # Вызываем в первый раз для запуска цикла
 
 
@@ -77,7 +74,7 @@ class TurtleActionClient(Node):
 
         self.curr_cmd += 1
         if (self.curr_cmd >= len(self.cmds)):
-            self.get_logger().warn('Выполнение всех команд завершено! Итоговая одометрия: %d\n' %
+            self.get_logger().info('Исполнение всех команд завершено! Итоговая одометрия: %f' %
                         (self.odom))
             rclpy.shutdown() # Все команды выполнены, выходим.
         else:
@@ -88,9 +85,9 @@ class TurtleActionClient(Node):
         feedback = future.feedback
         # print('\n======\n', future, feedback, feedback.odom, '\n======\n')
 
-        odom_step = feedback.odom
+        odom_step = feedback.odom / 1000000.0
         self.odom += odom_step
-        self.get_logger().info('Получено обновление данных одометрии от сервера: %d (итого: %d)' %
+        self.get_logger().info('Получено обновление данных одометрии от сервера: %f (итого: %f)' %
                                (odom_step, self.odom))
         # self.get_logger().info('Итоговая одометрия на текущий момент: %d' %
         #                        (self.odom))
@@ -99,9 +96,34 @@ class TurtleActionClient(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    action_client = TurtleActionClient()
+    cmd_array = [
+        ['sdgsdfgfhkj', 123, 321],
+        ['turn_left', 0, 180],
+        ['turn_right', 0, 180],
+        ['turn_left', 0, 360],
+        ['forward', 4, 0], # ['forward', 2, 0], 
+        ['turn_left', 0, 450], # ['turn_left', 0, 90],
+        ['forward', 2, 0], # ['forward', 1, 0],
+        ['turn_right', 0, 90],
+        ['turn_left', 0, -180],
+        ['forward', -2, 0],
+    ]
 
-    rclpy.spin(action_client)
+    cmd_input = input('Введите первую команду в формате "КОМАНДА РАССТ-Е ПОВОРОТ" (пропуск - исп. образец): ')
+    if cmd_input:
+        cmd_array.clear()
+
+        while cmd_input:
+            cmd = cmd_input.split(' ')
+            # print('\n======\n', cmd, '\n======\n')
+            cmd_array.append([cmd[0], int(cmd[1]), int(cmd[2])])
+
+            cmd_input = input('Введите очередную команду в этом же формате (пропуск - начать исполнение): ')
+
+
+    tc_client = TurtleActionClient(cmd_array)
+
+    rclpy.spin(tc_client)
 
 
 if __name__ == '__main__':
