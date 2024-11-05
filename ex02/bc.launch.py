@@ -1,5 +1,6 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
+
 from launch.actions import ExecuteProcess
 
 
@@ -12,7 +13,7 @@ def generate_launch_description():
         ),
         Node(
             package='m4e2_carrot',
-            executable='turtle_bc',
+            executable='broadcaster',
             name='broadcaster_main',
             parameters=[
                 {'turtlename': 'turtle1'},
@@ -28,5 +29,10 @@ def generate_launch_description():
             cmd=['gnome-terminal', '--', 'bash', '-c',
                  "ros2 run tf2_ros tf2_echo world turtle1"],
             output='screen',
-        )
+        ),
+        ExecuteProcess(
+            cmd=['gnome-terminal', '--', 'bash', '-c',
+                 "ros2 topic echo /tf"],
+            output='screen',
+        ),
     ])

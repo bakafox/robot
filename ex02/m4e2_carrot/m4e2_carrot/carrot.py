@@ -17,8 +17,8 @@ class DynamicFrameBroadcaster(Node):
         self.radius = self.declare_parameter('radius').get_parameter_value().integer_value
         self.direction = self.declare_parameter('direction').get_parameter_value().integer_value
         self.direction = (1.0 if (self.direction > 0) else -1.0)
-        self.get_logger().warn('============\n %s %s %f %f \n============' %
-                               (self.target, self.name, self.radius, self.direction))
+        # self.get_logger().warn('============\n %s %s %f %f \n============' %
+        #                        (self.target, self.name, self.radius, self.direction))
 
         # Просто публикуем tf2-преобразования каждые N сек по таймеру
         self.tf_broadcaster = TransformBroadcaster(self)
@@ -41,15 +41,10 @@ class DynamicFrameBroadcaster(Node):
         t.transform.translation.x = self.radius * np.sin(time * self.direction)
         t.transform.translation.y = self.radius * np.cos(time * self.direction)
         t.transform.translation.z = 0.0
-        self.get_logger().warn('======\n %f %f %f %f \n ======' %
-                               (time, t.transform.translation.x, t.transform.translation.y, t.transform.translation.z))
-
-        # 2. Углы поворота в кватернионах
-        # (https://docs.ros.org/en/humble/Tutorials/Intermediate/Tf2/Quaternion-Fundamentals.html)
-        t.transform.rotation.x = 0.0
-        t.transform.rotation.y = 0.0
-        t.transform.rotation.z = 0.0
-        t.transform.rotation.w = 2.0
+        # self.get_logger().warn('======\n %f %f %f %f \n ======' %
+        #                        (time, t.transform.translation.x, t.transform.translation.y, t.transform.translation.z))
+        # self.get_logger().warn('======\n %f %f %f %f \n ======' %
+        #                        (t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z, t.transform.rotation.w))
 
         # Наконец, отправляем сообщение преобразования
         self.tf_broadcaster.sendTransform(t)

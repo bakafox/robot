@@ -47,10 +47,13 @@ class FrameListener(Node):
             if self.turtle_spawned:
                 # На основе последних в буфере tf2-преобразованиях
                 # turtle1 и turtle2 получаем tf2-преобразование такое,
-                # чтобы оно максимально приближало turtle2 к turtle1
+                # чтобы оно максимально приближало turtle2 к turtle1...
+
                 try:
-                    # МОМЕНТ (назад) ВО ВРЕМЕНИ ОТНОСИТЕЛЬНО (абсолютного) ВРЕМЕНИ БУФЕРА
+                    # Находим момент в прошлом во времени относительно текущего момента
                     delay = self.get_clock().now() - rclpy.time.Duration(seconds=self.delay_sec)
+
+                    # Собственно, выполнение преобразования до точки в прошлом:
 
                     # t = self.tf_buffer.lookup_transform(
                     #     self.turtlename, # Нач. точка
@@ -59,16 +62,20 @@ class FrameListener(Node):
                     #     rclpy.duration.Duration(seconds=0.05) # Время ожидания доступности момента во времени
                     # )
 
-                    # От имплементации выше у черепашки начинается шиза, поэтому исп.
-                    # имплементацию с оринетацией как на неизм., так и на изм. фреймы
+                    # От имплементации выше в черепашьем поезде начинается сущий кошмар
+                    # (см. kowmap.png), поскольку преобразование будет выполняться
+                    # ДО точки в моменте прошлого ОТ точки в ЭТОТ ЖЕ МОМЕНТ ПРОШЛОГО,
+                    # а не ОТ точки В НАСТОЯЩИЙ МОМЕНТ. Это решает имплементация ниже:
+
                     t = self.tf_buffer.lookup_transform_full(
-                        target_frame=self.turtlename, # Нач. точка
-                        target_time=rclpy.time.Time(), # Текущее время
-                        source_frame=self.target_frame, # Кон. точка
-                        source_time=delay, # Момент во времени в прошлом (отн. буфера)
-                        fixed_frame='world', # Фрейм, который считать константным во времени
+                        target_frame=self.turtlename, # Начальная точка
+                        target_time=rclpy.time.Time(), # Момент во времени для нач. точки
+                        source_frame=self.target_frame, # Конечная точка
+                        source_time=delay, # Момент во времени для кон. точки
+                        fixed_frame='world', # Фрейм, который считать КОНСТАНТНЫМ во времени
                         timeout=rclpy.duration.Duration(seconds=0.05)
                     )
+
                 except TransformException as ex:
                     self.get_logger().info(
                         f'Could not transform {self.turtlename} to {self.turtlename}: {ex}')
