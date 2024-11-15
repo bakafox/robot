@@ -1,0 +1,4 @@
+[submodule "sensors"]
+	path = my_robot
+	url = git@github.com:virusapex/my_robot.git
+	branch = sensors
