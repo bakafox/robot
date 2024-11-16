@@ -1,19 +1,25 @@
-# Сборка
+# Небольшой FAQ по упражнению 10
+
+
+### Сборка
 ```bash
 source ~/ros2_ws/install/setup.bash
 colcon build --symlink-install --packages-select m2e10_t2cv
 ```
 
+
 ### Ошибка "setup.py is deprecated...", что делать?
 
 ![alt text](<setup.py install is deprecated warning shows up every time I open a terminal in VSCode - Stack Overflow.png>)
 
-# Запуск
+
+### Запуск
 ```bash
 ros2 run m2e10_t2cv text_to_cmd_vel
 ```
 
-# Примеры сообщений
+
+### Примеры сообщений
 ```bash
 # Неизвестная команда
 ros2 topic pub --once /cmd_text std_msgs/msg/String "{data: 'adasd'}"
